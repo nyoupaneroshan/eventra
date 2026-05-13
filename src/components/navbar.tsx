@@ -3,16 +3,16 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Phone, X } from 'lucide-react';
+import { Menu, Phone, Shield } from 'lucide-react';
 
 const navLinks = [
-  { label: 'Home', href: '#home' },
-  { label: 'About', href: '#about' },
-  { label: 'Services', href: '#services' },
-  { label: 'Portfolio', href: '#portfolio' },
-  { label: 'Testimonials', href: '#testimonials' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Home', href: '#/' },
+  { label: 'About', href: '#/about' },
+  { label: 'Services', href: '#/services' },
+  { label: 'Portfolio', href: '#/portfolio' },
+  { label: 'Testimonials', href: '#/testimonials' },
+  { label: 'Pricing', href: '#/pricing' },
+  { label: 'Contact', href: '#/contact' },
 ];
 
 export default function Navbar() {
@@ -27,12 +27,8 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleNavClick = (href: string) => {
+  const handleNavClick = () => {
     setMobileOpen(false);
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
   };
 
   return (
@@ -47,11 +43,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <a
-            href="#home"
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('#home');
-            }}
+            href="#/"
             className="flex items-center gap-2 group"
           >
             <div className="w-10 h-10 rounded-full bg-rose flex items-center justify-center overflow-hidden">
@@ -76,10 +68,6 @@ export default function Navbar() {
               <a
                 key={link.href}
                 href={link.href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick(link.href);
-                }}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 hover:bg-rose/10 ${
                   scrolled
                     ? 'text-foreground hover:text-rose-dark'
@@ -92,11 +80,24 @@ export default function Navbar() {
             <Button
               size="sm"
               className="ml-3 bg-rose hover:bg-rose-dark text-white"
-              onClick={() => handleNavClick('#contact')}
+              asChild
             >
-              <Phone className="w-4 h-4 mr-1" />
-              Get Quote
+              <a href="#/contact">
+                <Phone className="w-4 h-4 mr-1" />
+                Get Quote
+              </a>
             </Button>
+            <a
+              href="#/admin"
+              className={`ml-2 px-2 py-1 rounded text-xs font-medium transition-colors duration-200 ${
+                scrolled
+                  ? 'text-muted-foreground hover:text-rose-dark'
+                  : 'text-white/40 hover:text-white/70'
+              }`}
+              title="Admin Panel"
+            >
+              <Shield className="w-4 h-4" />
+            </a>
           </div>
 
           {/* Mobile Menu */}
@@ -121,10 +122,7 @@ export default function Navbar() {
                   <a
                     key={link.href}
                     href={link.href}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleNavClick(link.href);
-                    }}
+                    onClick={handleNavClick}
                     className="px-4 py-3 rounded-md text-base font-medium text-foreground hover:bg-rose/10 hover:text-rose-dark transition-colors"
                   >
                     {link.label}
@@ -133,10 +131,12 @@ export default function Navbar() {
                 <div className="mt-4 pt-4 border-t">
                   <Button
                     className="w-full bg-rose hover:bg-rose-dark text-white"
-                    onClick={() => handleNavClick('#contact')}
+                    asChild
                   >
-                    <Phone className="w-4 h-4 mr-2" />
-                    Get Free Quote
+                    <a href="#/contact" onClick={handleNavClick}>
+                      <Phone className="w-4 h-4 mr-2" />
+                      Get Free Quote
+                    </a>
                   </Button>
                 </div>
               </div>

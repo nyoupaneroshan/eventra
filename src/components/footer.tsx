@@ -3,12 +3,12 @@
 import { Heart, ArrowUp } from 'lucide-react';
 
 const quickLinks = [
-  { label: 'Home', href: '#home' },
-  { label: 'About', href: '#about' },
-  { label: 'Services', href: '#services' },
-  { label: 'Portfolio', href: '#portfolio' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Home', href: '#/' },
+  { label: 'About', href: '#/about' },
+  { label: 'Services', href: '#/services' },
+  { label: 'Portfolio', href: '#/portfolio' },
+  { label: 'Pricing', href: '#/pricing' },
+  { label: 'Contact', href: '#/contact' },
 ];
 
 const serviceLinks = [
@@ -23,13 +23,6 @@ const serviceLinks = [
 export default function Footer() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleNavClick = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
   };
 
   return (
@@ -66,10 +59,6 @@ export default function Footer() {
                 <li key={link.href}>
                   <a
                     href={link.href}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleNavClick(link.href);
-                    }}
                     className="text-white/70 hover:text-rose-light text-sm transition-colors duration-200"
                   >
                     {link.label}
