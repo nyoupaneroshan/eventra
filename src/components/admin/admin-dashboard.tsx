@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Mail, Heart, Camera, MessageSquare, Clock, User, Phone, Calendar } from 'lucide-react';
-import { getInquiries, getServices, getPortfolioItems, getTestimonials } from '@/lib/api';
+import { Mail, Heart, Camera, MessageSquare, Clock, User, Calendar, BookOpen, HelpCircle, FileText } from 'lucide-react';
+import { getInquiries, getServices, getPortfolioItems, getTestimonials, getBlogPosts, getFAQs, getLegalPages } from '@/lib/api';
 import type { Inquiry, Service, PortfolioItem, Testimonial } from '@/lib/types';
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({ inquiries: 0, services: 0, portfolio: 0, testimonials: 0 });
+  const [stats, setStats] = useState({ inquiries: 0, services: 0, portfolio: 0, testimonials: 0, blogs: 0, faqs: 0, legalPages: 0 });
   const [recentInquiries, setRecentInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,6 +24,9 @@ export default function AdminDashboard() {
         services: services.filter((s) => s.active).length,
         portfolio: portfolio.filter((p) => p.active).length,
         testimonials: testimonials.filter((t) => t.active).length,
+        blogs: 0,
+        faqs: 0,
+        legalPages: 0,
       });
       setRecentInquiries(
         inquiries
@@ -42,13 +45,16 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
+      <div>
+        <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
+        <p className="text-muted-foreground text-sm mt-1">Welcome back! Here is an overview of your website.</p>
+      </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">New Inquiries</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Inquiries</CardTitle>
             <Mail className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -87,7 +93,7 @@ export default function AdminDashboard() {
       {/* Recent Inquiries */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Recent Inquiries</CardTitle>
+          <CardTitle className="text-lg flex items-center gap-2"><Mail className="w-5 h-5" />Recent Inquiries</CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -97,7 +103,7 @@ export default function AdminDashboard() {
               ))}
             </div>
           ) : recentInquiries.length === 0 ? (
-            <p className="text-muted-foreground text-sm text-center py-8">No inquiries yet.</p>
+            <p className="text-muted-foreground text-sm text-center py-8">No inquiries yet. They will appear here when customers submit the contact form.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

@@ -32,7 +32,7 @@ export default function AdminBlog() {
   useEffect(() => { load(); }, []);
 
   const openCreate = () => { setEditing(null); setForm(emptyForm); setDialogOpen(true); };
-  const openEdit = (p: BlogPost) => { setEditing(p); setForm({ title: p.title, slug: p.slug, excerpt: p.excerpt, content: p.content, image: p.image, category: p.category, tags: Array.isArray(JSON.parse(p.tags || '[]')) ? JSON.parse(p.tags || '[]').join(', ') : '', author: p.author, published: p.published, metaTitle: p.metaTitle, metaDesc: p.metaDesc }); setDialogOpen(true); };
+  const openEdit = (p: BlogPost) => { setEditing(p); let tagsStr = ''; try { const parsed = JSON.parse(p.tags || '[]'); tagsStr = Array.isArray(parsed) ? parsed.join(', ') : ''; } catch { tagsStr = ''; } setForm({ title: p.title, slug: p.slug, excerpt: p.excerpt, content: p.content, image: p.image, category: p.category, tags: tagsStr, author: p.author, published: p.published, metaTitle: p.metaTitle, metaDesc: p.metaDesc }); setDialogOpen(true); };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]; if (!file) return;
@@ -120,7 +120,7 @@ export default function AdminBlog() {
         </DialogContent>
       </Dialog>
 
-      <AdminDeleteDialog open={deleteOpen} onOpenChange={setDeleteOpen} onConfirm={handleDelete} title="Delete Post" description={`Are you sure you want to delete "${deleting?.title}"?`} />
+      <AdminDeleteDialog open={deleteOpen} onOpenChange={setDeleteOpen} onConfirm={handleDelete} itemName={deleting?.title || ''} title="Delete Post" description={`Are you sure you want to delete "${deleting?.title}"?`} />
     </div>
   );
 }

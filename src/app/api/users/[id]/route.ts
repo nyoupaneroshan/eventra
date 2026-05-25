@@ -1,18 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { verifyAuth } from '@/lib/auth';
+import { createHash } from 'crypto';
 
-async function verifyAuth(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  const token = authHeader?.replace('Bearer ', '');
-  if (!token) return null;
-  const session = await db.adminSession.findUnique({ where: { token } });
-  if (!session || new Date() > session.expiresAt) return null;
-  return session;
+function hashPassword(password: string): string {
+  return createHash('sha256').update(password).digest('hex');
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await verifyAuth(request);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await verifyAuth(request);
+  if (!auth.authorized) return auth.error!;
   
   try {
     const { id } = await params;
@@ -22,7 +19,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (data.email !== undefined) updateData.email = data.email;
     if (data.role !== undefined) updateData.role = data.role;
     if (data.active !== undefined) updateData.active = data.active;
-    if (data.password) updateData.password = data.password;
+    if (data.password) updateData.password = hashPassword(data.password);
     
     const user = await db.adminUser.update({
       where: { id },
@@ -37,8 +34,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await verifyAuth(request);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await verifyAuth(request);
+  if (!auth.authorized) return auth.error!;
   
   try {
     const { id } = await params;

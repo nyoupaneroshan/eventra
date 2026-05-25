@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { verifyAuth } from '@/lib/auth';
 
 export async function GET() {
   const info = await db.contactInfo.findFirst();
-  if (!info) return NextResponse.json({ phone: '', email: '', address: '', whatsapp: '', viber: '', workingHours: '' });
+  if (!info) return NextResponse.json({ id: '', phone: '', email: '', address: '', whatsapp: '', viber: '', workingHours: '' });
   return NextResponse.json(info);
 }
 
 export async function PUT(request: NextRequest) {
+  const auth = await verifyAuth(request);
+  if (!auth.authorized) return auth.error!;
   try {
     const body = await request.json();
     const existing = await db.contactInfo.findFirst();

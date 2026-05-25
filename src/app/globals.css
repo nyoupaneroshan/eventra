@@ -140,16 +140,16 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--champagne);
+  background: var(--color-champagne);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--rose-light);
+  background: var(--color-rose-light);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--rose);
+  background: var(--color-rose);
 }
 
 /* Animation keyframes */

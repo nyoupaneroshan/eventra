@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { verifyAuth } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const auth = await verifyAuth(request);
+  if (!auth.authorized) return auth.error!;
   const inquiries = await db.inquiry.findMany({ orderBy: { createdAt: 'desc' }, take: 50 });
-  return NextResponse.json({ inquiries });
+  return NextResponse.json(inquiries);
 }
 
 export async function POST(request: NextRequest) {

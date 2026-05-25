@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { verifyAuth } from '@/lib/auth';
 
 export async function GET() {
   const settings = await db.siteSetting.findMany();
@@ -9,6 +10,8 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
+  const auth = await verifyAuth(request);
+  if (!auth.authorized) return auth.error!;
   try {
     const body: Record<string, string> = await request.json();
     for (const [key, value] of Object.entries(body)) {

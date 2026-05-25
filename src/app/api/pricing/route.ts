@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { verifyAuth, hasAuthHeader } from '@/lib/auth';
 
-export async function GET() {
-  const items = await db.pricingPackage.findMany({ orderBy: { order: 'asc' } });
+export async function GET(request: NextRequest) {
+  if (hasAuthHeader(request)) {
+    const auth = await verifyAuth(request);
+    if (auth.authorized) {
+      const items = await db.pricingPackage.findMany({ orderBy: { order: 'asc' } });
+      return NextResponse.json(items);
+    }
+  }
+  const items = await db.pricingPackage.findMany({ where: { active: true }, orderBy: { order: 'asc' } });
   return NextResponse.json(items);
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await verifyAuth(request);
+  if (!auth.authorized) return auth.error!;
   try {
     const body = await request.json();
     const item = await db.pricingPackage.create({ data: body });

@@ -1,17 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { verifyAuth, hasAuthHeader } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  if (hasAuthHeader(request)) {
+    const auth = await verifyAuth(request);
+    if (auth.authorized) {
+      const faqs = await db.fAQ.findMany({ orderBy: { order: 'asc' } });
+      return NextResponse.json(faqs);
+    }
+  }
   const faqs = await db.fAQ.findMany({ where: { active: true }, orderBy: { order: 'asc' } });
   return NextResponse.json(faqs);
 }
 
 export async function POST(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  const token = authHeader?.replace('Bearer ', '');
-  if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const session = await db.adminSession.findUnique({ where: { token } });
-  if (!session || new Date() > session.expiresAt) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await verifyAuth(request);
+  if (!auth.authorized) return auth.error!;
 
   try {
     const data = await request.json();

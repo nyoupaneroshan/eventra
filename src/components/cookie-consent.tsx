@@ -1,14 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Cookie } from 'lucide-react';
 
 export default function CookieConsent() {
-  const [visible, setVisible] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return !localStorage.getItem('cookie_consent');
-  });
+  const [visible, setVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const consent = localStorage.getItem('cookie_consent');
+    if (!consent) {
+      setVisible(true);
+    }
+  }, []);
 
   const accept = () => {
     localStorage.setItem('cookie_consent', 'accepted');
@@ -20,7 +26,7 @@ export default function CookieConsent() {
     setVisible(false);
   };
 
-  if (!visible) return null;
+  if (!mounted || !visible) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t shadow-lg p-4 animate-fade-in-up">

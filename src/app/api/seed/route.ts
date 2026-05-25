@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { createHash } from 'crypto';
 
 export async function POST() {
   try {
@@ -169,7 +170,7 @@ export async function POST() {
     const existingUsers = await db.adminUser.count();
     if (existingUsers === 0) {
       await db.adminUser.create({
-        data: { name: 'Admin', email: 'admin@eventra.com', password: 'admin123', role: 'admin', active: true },
+        data: { name: 'Admin', email: 'admin@eventra.com', password: createHash('sha256').update('admin123').digest('hex'), role: 'admin', active: true },
       });
     }
 

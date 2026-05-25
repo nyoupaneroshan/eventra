@@ -15,7 +15,9 @@ interface AdminDeleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
-  itemName: string;
+  itemName?: string;
+  title?: string;
+  description?: string;
 }
 
 export default function AdminDeleteDialog({
@@ -23,14 +25,16 @@ export default function AdminDeleteDialog({
   onOpenChange,
   onConfirm,
   itemName,
+  title,
+  description,
 }: AdminDeleteDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+          <AlertDialogTitle>{title || 'Are you sure?'}</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete &ldquo;{itemName}&rdquo;. This action cannot be undone.
+            {description || (itemName ? `This will permanently delete "${itemName}". This action cannot be undone.` : 'This action cannot be undone.')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
