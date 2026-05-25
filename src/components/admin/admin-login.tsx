@@ -24,7 +24,7 @@ export default function AdminLogin() {
     try {
       await adminLogin(email, password);
       toast({ title: 'Login successful', description: 'Welcome to the admin panel.' });
-      window.location.hash = '#/admin';
+      window.location.hash = '/admin';
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid credentials');
     } finally {

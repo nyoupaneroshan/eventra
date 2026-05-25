@@ -78,27 +78,30 @@ function SidebarContent({ onNavigate, onLogout }: { onNavigate: () => void; onLo
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [authed, setAuthed] = useState(false);
+  const [checked, setChecked] = useState(false);
 
-  const authed = typeof window !== 'undefined' && isAdminAuthenticated();
-
-  const redirect = useCallback(() => {
-    if (typeof window !== 'undefined' && !isAdminAuthenticated()) {
-      window.location.hash = '#/admin/login';
+  useEffect(() => {
+    const isAuth = isAdminAuthenticated();
+    setAuthed(isAuth);
+    setChecked(true);
+    if (!isAuth) {
+      window.location.hash = '/admin/login';
     }
   }, []);
 
-  useEffect(() => {
-    redirect();
-  }, [redirect]);
-
   const handleLogout = () => {
     clearAdminToken();
-    window.location.hash = '#/admin/login';
+    window.location.hash = '/admin/login';
   };
 
   const handleNavigate = () => {
     setSidebarOpen(false);
   };
+
+  if (!checked) {
+    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-4 border-rose border-t-transparent rounded-full"></div></div>;
+  }
 
   if (!authed) {
     return null;
