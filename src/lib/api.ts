@@ -1,13 +1,6 @@
 import type {
-  HeroSlide,
-  AboutContent,
-  Service,
-  PortfolioItem,
-  Testimonial,
-  PricingPackage,
-  ContactInfoData,
-  Inquiry,
-  InquiryFormData,
+  HeroSlide, AboutContent, Service, PortfolioItem, Testimonial, PricingPackage,
+  ContactInfoData, Inquiry, InquiryFormData, AdminUser, BlogPost, LegalPage, FAQItem,
 } from './types';
 
 const BASE = '';
@@ -185,4 +178,72 @@ export async function uploadImage(file: File): Promise<{ url: string }> {
   });
   if (!res.ok) throw new Error('Upload failed');
   return res.json();
+}
+
+// Admin Users
+export async function getAdminUsers(): Promise<AdminUser[]> {
+  return apiFetch<AdminUser[]>('/api/users', { headers: adminHeaders() });
+}
+export async function createAdminUser(data: { name: string; email: string; password: string; role?: string }): Promise<AdminUser> {
+  return apiFetch('/api/users', { method: 'POST', body: JSON.stringify(data), headers: adminHeaders() });
+}
+export async function updateAdminUser(id: string, data: Partial<AdminUser & { password?: string }>): Promise<AdminUser> {
+  return apiFetch(`/api/users/${id}`, { method: 'PUT', body: JSON.stringify(data), headers: adminHeaders() });
+}
+export async function deleteAdminUser(id: string): Promise<void> {
+  await apiFetch(`/api/users/${id}`, { method: 'DELETE', headers: adminHeaders() });
+}
+
+// Blog Posts (public)
+export async function getBlogPosts(): Promise<BlogPost[]> {
+  return apiFetch<BlogPost[]>('/api/blog');
+}
+export async function getBlogPostBySlug(slug: string): Promise<BlogPost> {
+  return apiFetch<BlogPost>(`/api/blog/slug/${slug}`);
+}
+// Blog Posts (admin)
+export async function createBlogPost(data: Partial<BlogPost>): Promise<BlogPost> {
+  return apiFetch('/api/blog', { method: 'POST', body: JSON.stringify(data), headers: adminHeaders() });
+}
+export async function updateBlogPost(id: string, data: Partial<BlogPost>): Promise<BlogPost> {
+  return apiFetch(`/api/blog/${id}`, { method: 'PUT', body: JSON.stringify(data), headers: adminHeaders() });
+}
+export async function deleteBlogPost(id: string): Promise<void> {
+  await apiFetch(`/api/blog/${id}`, { method: 'DELETE', headers: adminHeaders() });
+}
+
+// Legal Pages (public)
+export async function getLegalPages(): Promise<LegalPage[]> {
+  return apiFetch<LegalPage[]>('/api/legal');
+}
+export async function getLegalPageBySlug(slug: string): Promise<LegalPage> {
+  return apiFetch<LegalPage>(`/api/legal/slug/${slug}`);
+}
+// Legal Pages (admin)
+export async function createLegalPage(data: Partial<LegalPage>): Promise<LegalPage> {
+  return apiFetch('/api/legal', { method: 'POST', body: JSON.stringify(data), headers: adminHeaders() });
+}
+export async function updateLegalPage(id: string, data: Partial<LegalPage>): Promise<LegalPage> {
+  return apiFetch(`/api/legal/${id}`, { method: 'PUT', body: JSON.stringify(data), headers: adminHeaders() });
+}
+export async function deleteLegalPage(id: string): Promise<void> {
+  await apiFetch(`/api/legal/${id}`, { method: 'DELETE', headers: adminHeaders() });
+}
+
+// FAQs (public)
+export async function getFAQs(): Promise<FAQItem[]> {
+  return apiFetch<FAQItem[]>('/api/faq');
+}
+// FAQs (admin)
+export async function getAllFAQs(): Promise<FAQItem[]> {
+  return apiFetch<FAQItem[]>('/api/faq', { headers: adminHeaders() });
+}
+export async function createFAQ(data: Partial<FAQItem>): Promise<FAQItem> {
+  return apiFetch('/api/faq', { method: 'POST', body: JSON.stringify(data), headers: adminHeaders() });
+}
+export async function updateFAQ(id: string, data: Partial<FAQItem>): Promise<FAQItem> {
+  return apiFetch(`/api/faq/${id}`, { method: 'PUT', body: JSON.stringify(data), headers: adminHeaders() });
+}
+export async function deleteFAQ(id: string): Promise<void> {
+  await apiFetch(`/api/faq/${id}`, { method: 'DELETE', headers: adminHeaders() });
 }

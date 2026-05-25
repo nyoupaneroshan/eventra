@@ -4,17 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
-  LayoutDashboard,
-  Image,
-  Heart,
-  Camera,
-  MessageSquare,
-  CreditCard,
-  Mail,
-  Phone,
-  Settings,
-  LogOut,
-  Menu,
+  LayoutDashboard, Image, Heart, Camera, MessageSquare, CreditCard,
+  Mail, Phone, Settings, LogOut, Menu, BookOpen, HelpCircle, FileText, Users,
 } from 'lucide-react';
 import { isAdminAuthenticated, clearAdminToken } from '@/lib/api';
 
@@ -25,8 +16,12 @@ const sidebarLinks = [
   { label: 'Portfolio', icon: Camera, href: '#/admin/portfolio' },
   { label: 'Testimonials', icon: MessageSquare, href: '#/admin/testimonials' },
   { label: 'Pricing', icon: CreditCard, href: '#/admin/pricing' },
+  { label: 'Blog', icon: BookOpen, href: '#/admin/blog' },
+  { label: 'FAQ', icon: HelpCircle, href: '#/admin/faq' },
   { label: 'Inquiries', icon: Mail, href: '#/admin/inquiries' },
   { label: 'Contact Info', icon: Phone, href: '#/admin/contact' },
+  { label: 'Legal Pages', icon: FileText, href: '#/admin/legal' },
+  { label: 'Users', icon: Users, href: '#/admin/users' },
   { label: 'Settings', icon: Settings, href: '#/admin/settings' },
 ];
 

@@ -106,3 +106,52 @@ export interface InquiryFormData {
   eventDate: string;
   message?: string;
 }
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  image: string;
+  category: string;
+  tags: string;
+  author: string;
+  published: boolean;
+  metaTitle: string;
+  metaDesc: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LegalPage {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  type: string;
+  metaTitle: string;
+  metaDesc: string;
+  updatedAt: string;
+  createdAt: string;
+}
+
+export interface FAQItem {
+  id: string;
+  question: string;
+  answer: string;
+  category: string;
+  order: number;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
