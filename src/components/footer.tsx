@@ -1,22 +1,23 @@
 'use client';
 
 import { Heart, ArrowUp } from 'lucide-react';
+import Link from 'next/link';
 
 const quickLinks = [
-  { label: 'Home', href: '#/' },
-  { label: 'About', href: '#/about' },
-  { label: 'Services', href: '#/services' },
-  { label: 'Portfolio', href: '#/portfolio' },
-  { label: 'Blog', href: '#/blog' },
-  { label: 'FAQ', href: '#/faq' },
-  { label: 'Contact', href: '#/contact' },
+  { label: 'Home', href: '/' },
+  { label: 'About', href: '/about' },
+  { label: 'Services', href: '/services' },
+  { label: 'Portfolio', href: '/portfolio' },
+  { label: 'Blog', href: '/blog' },
+  { label: 'FAQ', href: '/faq' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 const legalLinks = [
-  { label: 'Privacy Policy', href: '#/privacy-policy' },
-  { label: 'Terms & Conditions', href: '#/terms-and-conditions' },
-  { label: 'Cookie Policy', href: '#/cookie-policy' },
-  { label: 'Refund Policy', href: '#/refund-policy' },
+  { label: 'Privacy Policy', href: '/privacy-policy' },
+  { label: 'Terms & Conditions', href: '/terms-and-conditions' },
+  { label: 'Cookie Policy', href: '/cookie-policy' },
+  { label: 'Refund Policy', href: '/refund-policy' },
 ];
 
 const serviceLinks = [
@@ -52,7 +53,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.href}>
-                  <a href={link.href} className="text-white/70 hover:text-rose-light text-sm transition-colors duration-200">{link.label}</a>
+                  <Link href={link.href} className="text-white/70 hover:text-rose-light text-sm transition-colors duration-200">{link.label}</Link>
                 </li>
               ))}
             </ul>
@@ -74,7 +75,7 @@ export default function Footer() {
             <ul className="space-y-2 mb-6">
               {legalLinks.map((link) => (
                 <li key={link.href}>
-                  <a href={link.href} className="text-white/70 hover:text-rose-light text-sm transition-colors duration-200">{link.label}</a>
+                  <Link href={link.href} className="text-white/70 hover:text-rose-light text-sm transition-colors duration-200">{link.label}</Link>
                 </li>
               ))}
             </ul>
@@ -106,8 +107,8 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} Eventra. Made with <Heart className="w-3 h-3 text-rose fill-rose"/> in Butwal, Nepal
           </p>
           <div className="flex items-center gap-4">
-            <a href="#/privacy-policy" className="text-white/40 hover:text-white/70 text-xs transition-colors">Privacy</a>
-            <a href="#/terms-and-conditions" className="text-white/40 hover:text-white/70 text-xs transition-colors">Terms</a>
+            <Link href="/privacy-policy" className="text-white/40 hover:text-white/70 text-xs transition-colors">Privacy</Link>
+            <Link href="/terms-and-conditions" className="text-white/40 hover:text-white/70 text-xs transition-colors">Terms</Link>
             <button onClick={scrollToTop}
               className="w-10 h-10 rounded-full bg-white/10 hover:bg-rose flex items-center justify-center transition-colors duration-300" aria-label="Scroll to top">
               <ArrowUp className="w-4 h-4" />

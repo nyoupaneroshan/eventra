@@ -6,9 +6,12 @@ import type {
 const BASE = '';
 
 async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
+  // Separate headers from other options to properly merge them
+  // (prevents ...options from overriding the Content-Type header)
+  const { headers: customHeaders, ...restOptions } = options || {};
   const res = await fetch(`${BASE}${url}`, {
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    ...options,
+    ...restOptions,
+    headers: { 'Content-Type': 'application/json', ...customHeaders },
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: 'Request failed' }));
@@ -26,11 +29,56 @@ export function getAdminToken(): string | null {
   return null;
 }
 export function clearAdminToken() {
-  if (typeof window !== 'undefined') localStorage.removeItem('admin_token');
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_role');
+    localStorage.removeItem('admin_user_id');
+  }
 }
 export function isAdminAuthenticated(): boolean {
   return !!getAdminToken();
 }
+
+// Role helpers
+export type UserRole = 'admin' | 'editor' | 'viewer';
+
+export function setAdminRole(role: string) {
+  if (typeof window !== 'undefined') localStorage.setItem('admin_role', role);
+}
+export function getAdminRole(): UserRole | null {
+  if (typeof window !== 'undefined') {
+    const role = localStorage.getItem('admin_role');
+    if (role === 'admin' || role === 'editor' || role === 'viewer') return role;
+    return null;
+  }
+  return null;
+}
+export function setAdminUserId(userId: string) {
+  if (typeof window !== 'undefined') localStorage.setItem('admin_user_id', userId);
+}
+export function getAdminUserId(): string | null {
+  if (typeof window !== 'undefined') return localStorage.getItem('admin_user_id');
+  return null;
+}
+
+const ROLE_HIERARCHY: Record<UserRole, number> = {
+  admin: 3,
+  editor: 2,
+  viewer: 1,
+};
+
+export function hasMinRole(minRole: UserRole): boolean {
+  const role = getAdminRole();
+  if (!role) return false;
+  return (ROLE_HIERARCHY[role] ?? 0) >= (ROLE_HIERARCHY[minRole] ?? 0);
+}
+
+export function isAdmin(): boolean { return getAdminRole() === 'admin'; }
+export function isEditor(): boolean {
+  const role = getAdminRole();
+  return role === 'admin' || role === 'editor';
+}
+export function isViewer(): boolean { return getAdminRole() === 'viewer'; }
 
 // Public APIs
 export async function getHeroSlides(): Promise<HeroSlide[]> {
@@ -59,12 +107,14 @@ export async function submitInquiry(data: InquiryFormData): Promise<void> {
 }
 
 // Admin Auth
-export async function adminLogin(email: string, password: string): Promise<{ token: string }> {
-  const res = await apiFetch<{ token: string }>('/api/admin/login', {
+export async function adminLogin(email: string, password: string): Promise<{ token: string; user: { id: string; name: string; email: string; role: string } }> {
+  const res = await apiFetch<{ token: string; user: { id: string; name: string; email: string; role: string } }>('/api/admin/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
   setAdminToken(res.token);
+  setAdminRole(res.user.role);
+  setAdminUserId(res.user.id);
   return res;
 }
 
@@ -72,9 +122,12 @@ export async function adminVerify(): Promise<boolean> {
   try {
     const token = getAdminToken();
     if (!token) return false;
-    await apiFetch('/api/admin/verify', {
+    const res = await apiFetch<{ valid: boolean; role: string; userId: string }>('/api/admin/verify', {
       headers: { Authorization: `Bearer ${token}` },
     });
+    // Sync role from server in case it changed
+    if (res.role) setAdminRole(res.role);
+    if (res.userId) setAdminUserId(res.userId);
     return true;
   } catch {
     return false;

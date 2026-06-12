@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Cookie } from 'lucide-react';
+import Link from 'next/link';
 
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false);
@@ -33,7 +34,7 @@ export default function CookieConsent() {
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center gap-4">
         <div className="flex items-center gap-3 flex-1">
           <Cookie className="w-6 h-6 text-gold shrink-0" />
-          <p className="text-sm text-muted-foreground">We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies. <a href="#/cookie-policy" className="text-rose-dark hover:underline">Learn more</a></p>
+          <p className="text-sm text-muted-foreground">We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies. <Link href="/cookie-policy" className="text-rose-dark hover:underline">Learn more</Link></p>
         </div>
         <div className="flex gap-2 shrink-0">
           <Button variant="outline" size="sm" onClick={decline}>Decline</Button>

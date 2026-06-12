@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { verifyAuth } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  const token = authHeader?.replace('Bearer ', '');
-  if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  const session = await db.adminSession.findUnique({ where: { token } });
-  if (!session || new Date() > session.expiresAt) {
+  const auth = await verifyAuth(request);
+  if (!auth.authorized) {
     return NextResponse.json({ error: 'Session expired' }, { status: 401 });
   }
-  return NextResponse.json({ valid: true });
+  return NextResponse.json({ valid: true, role: auth.role, userId: auth.userId });
 }

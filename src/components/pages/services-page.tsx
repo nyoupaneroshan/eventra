@@ -7,6 +7,7 @@ import { ArrowRight, CheckCircle2, Heart as HeartIcon, Building2 as Building2Ico
 import PageBanner from '@/components/page-banner';
 import { getServices } from '@/lib/api';
 import type { Service } from '@/lib/types';
+import Link from 'next/link';
 
 const iconMap: Record<string, React.ElementType> = {
   Heart: HeartIcon,
@@ -78,10 +79,10 @@ export default function ServicesPage() {
                         ))}
                       </ul>
                       <Button variant="outline" className="w-full border-rose/30 text-rose-dark hover:bg-rose hover:text-white transition-colors duration-300" asChild>
-                        <a href="#/contact">
+                        <Link href="/contact">
                           Request Custom Quote
                           <ArrowRight className="ml-2 w-4 h-4" />
-                        </a>
+                        </Link>
                       </Button>
                     </div>
                   </div>

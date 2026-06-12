@@ -31,7 +31,8 @@ export async function POST(request: Request) {
 
     const token = crypto.randomUUID();
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    await db.adminSession.create({ data: { token, expiresAt } });
+    // Store userId in session so we can look up the user's role on subsequent requests
+    await db.adminSession.create({ data: { token, userId: user.id, expiresAt } });
     
     return NextResponse.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
   } catch (error) {

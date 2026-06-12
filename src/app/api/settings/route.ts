@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { verifyAuth } from '@/lib/auth';
+import { verifyAuth, requireRole } from '@/lib/auth';
 
 export async function GET() {
   const settings = await db.siteSetting.findMany();
@@ -9,8 +9,9 @@ export async function GET() {
   return NextResponse.json(map);
 }
 
+// PUT /api/settings — Admin only
 export async function PUT(request: NextRequest) {
-  const auth = await verifyAuth(request);
+  const auth = requireRole(await verifyAuth(request), 'admin');
   if (!auth.authorized) return auth.error!;
   try {
     const body: Record<string, string> = await request.json();

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { verifyAuth } from '@/lib/auth';
+import { verifyAuth, requireRole } from '@/lib/auth';
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -10,7 +10,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await verifyAuth(request);
+  const auth = requireRole(await verifyAuth(request), 'editor');
   if (!auth.authorized) return auth.error!;
   try {
     const { id } = await params;
@@ -24,7 +24,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await verifyAuth(request);
+  const auth = requireRole(await verifyAuth(request), 'editor');
   if (!auth.authorized) return auth.error!;
   try {
     const { id } = await params;

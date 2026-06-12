@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { getHeroSlides, getServices, getTestimonials } from '@/lib/api';
 import type { HeroSlide, Service, Testimonial } from '@/lib/types';
+import Link from 'next/link';
 
 const iconMap: Record<string, React.ElementType> = {
   Heart: HeartIcon,
@@ -120,13 +121,13 @@ function HeroSection() {
           </div>
           <div key={`cta-${current}`} className="animate-fade-in-up flex flex-col sm:flex-row gap-4 justify-center" style={{ animationDelay: '0.3s' }}>
             <Button size="lg" className="bg-rose hover:bg-rose-dark text-white text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300" asChild>
-              <a href="#/contact">
+              <Link href="/contact">
                 Get Free Quote
                 <ArrowRight className="ml-2 w-5 h-5" />
-              </a>
+              </Link>
             </Button>
             <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 text-lg px-8 py-6 rounded-full transition-all duration-300" asChild>
-              <a href="#/services">Our Services</a>
+              <Link href="/services">Our Services</Link>
             </Button>
           </div>
         </div>
@@ -242,10 +243,10 @@ function ServiceHighlights() {
                       ))}
                     </ul>
                     <Button variant="outline" className="w-full border-rose/30 text-rose-dark hover:bg-rose hover:text-white transition-colors duration-300" asChild>
-                      <a href="#/contact">
+                      <Link href="/contact">
                         Request Custom Quote
                         <ArrowRight className="ml-2 w-4 h-4" />
-                      </a>
+                      </Link>
                     </Button>
                   </div>
                 </div>
@@ -255,9 +256,9 @@ function ServiceHighlights() {
         )}
 
         <div className="text-center mt-8">
-          <a href="#/services" className="text-rose-dark font-semibold hover:underline inline-flex items-center gap-1">
+          <Link href="/services" className="text-rose-dark font-semibold hover:underline inline-flex items-center gap-1">
             View All Services <ArrowRight className="w-4 h-4" />
-          </a>
+          </Link>
         </div>
       </div>
     </section>
@@ -338,9 +339,9 @@ function TestimonialHighlights() {
         )}
 
         <div className="text-center mt-8">
-          <a href="#/testimonials" className="text-rose-dark font-semibold hover:underline inline-flex items-center gap-1">
+          <Link href="/testimonials" className="text-rose-dark font-semibold hover:underline inline-flex items-center gap-1">
             Read All Reviews <ArrowRight className="w-4 h-4" />
-          </a>
+          </Link>
         </div>
       </div>
     </section>
@@ -363,13 +364,13 @@ function CTASection() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button size="lg" className="bg-white text-rose-dark hover:bg-champagne text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300" asChild>
-            <a href="#/contact">
+            <Link href="/contact">
               Get Free Quote
               <ArrowRight className="ml-2 w-5 h-5" />
-            </a>
+            </Link>
           </Button>
           <Button size="lg" variant="outline" className="bg-transparent border-white/30 text-white hover:bg-white/10 text-lg px-8 py-6 rounded-full transition-all duration-300" asChild>
-            <a href="#/pricing">View Packages</a>
+            <Link href="/pricing">View Packages</Link>
           </Button>
         </div>
       </div>

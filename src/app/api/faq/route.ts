@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { verifyAuth, hasAuthHeader } from '@/lib/auth';
+import { verifyAuth, requireRole, hasAuthHeader } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   if (hasAuthHeader(request)) {
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const auth = await verifyAuth(request);
+  const auth = requireRole(await verifyAuth(request), 'editor');
   if (!auth.authorized) return auth.error!;
 
   try {

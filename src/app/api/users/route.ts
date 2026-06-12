@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { verifyAuth } from '@/lib/auth';
+import { verifyAuth, requireRole } from '@/lib/auth';
 import { createHash } from 'crypto';
 
 function hashPassword(password: string): string {
   return createHash('sha256').update(password).digest('hex');
 }
 
+// GET /api/users — List users (admin only)
 export async function GET(request: NextRequest) {
-  const auth = await verifyAuth(request);
+  const auth = requireRole(await verifyAuth(request), 'admin');
   if (!auth.authorized) return auth.error!;
   
   const users = await db.adminUser.findMany({
@@ -18,8 +19,9 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(users);
 }
 
+// POST /api/users — Create user (admin only)
 export async function POST(request: NextRequest) {
-  const auth = await verifyAuth(request);
+  const auth = requireRole(await verifyAuth(request), 'admin');
   if (!auth.authorized) return auth.error!;
   
   try {

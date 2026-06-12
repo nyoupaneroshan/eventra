@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { verifyAuth, requireRole } from '@/lib/auth';
 
 export async function GET() {
   const pages = await db.legalPage.findMany({ orderBy: { title: 'asc' } });
@@ -7,11 +8,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  const token = authHeader?.replace('Bearer ', '');
-  if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const session = await db.adminSession.findUnique({ where: { token } });
-  if (!session || new Date() > session.expiresAt) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = requireRole(await verifyAuth(request), 'editor');
+  if (!auth.authorized) return auth.error!;
 
   try {
     const data = await request.json();

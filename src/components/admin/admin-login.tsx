@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Loader2, Shield } from 'lucide-react';
 import { adminLogin } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -15,6 +17,7 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +27,7 @@ export default function AdminLogin() {
     try {
       await adminLogin(email, password);
       toast({ title: 'Login successful', description: 'Welcome to the admin panel.' });
-      window.location.hash = '/admin';
+      router.push('/admin');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid credentials');
     } finally {
@@ -81,9 +84,9 @@ export default function AdminLogin() {
             </Button>
           </form>
           <div className="mt-4 text-center">
-            <a href="#/" className="text-sm text-muted-foreground hover:text-rose-dark transition-colors">
+            <Link href="/" className="text-sm text-muted-foreground hover:text-rose-dark transition-colors">
               Back to website
-            </a>
+            </Link>
           </div>
         </CardContent>
       </Card>

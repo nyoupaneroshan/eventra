@@ -6,26 +6,64 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
   LayoutDashboard, Image, Heart, Camera, MessageSquare, CreditCard,
   Mail, Phone, Settings, LogOut, Menu, BookOpen, HelpCircle, FileText, Users,
+  Eye, Shield, ShieldCheck,
 } from 'lucide-react';
-import { isAdminAuthenticated, clearAdminToken } from '@/lib/api';
+import { isAdminAuthenticated, clearAdminToken, getAdminRole } from '@/lib/api';
+import type { UserRole } from '@/lib/api';
 
-const sidebarLinks = [
-  { label: 'Dashboard', icon: LayoutDashboard, href: '#/admin' },
-  { label: 'Hero Slides', icon: Image, href: '#/admin/hero' },
-  { label: 'Services', icon: Heart, href: '#/admin/services' },
-  { label: 'Portfolio', icon: Camera, href: '#/admin/portfolio' },
-  { label: 'Testimonials', icon: MessageSquare, href: '#/admin/testimonials' },
-  { label: 'Pricing', icon: CreditCard, href: '#/admin/pricing' },
-  { label: 'Blog', icon: BookOpen, href: '#/admin/blog' },
-  { label: 'FAQ', icon: HelpCircle, href: '#/admin/faq' },
-  { label: 'Inquiries', icon: Mail, href: '#/admin/inquiries' },
-  { label: 'Contact Info', icon: Phone, href: '#/admin/contact' },
-  { label: 'Legal Pages', icon: FileText, href: '#/admin/legal' },
-  { label: 'Users', icon: Users, href: '#/admin/users' },
-  { label: 'Settings', icon: Settings, href: '#/admin/settings' },
+interface SidebarLink {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  href: string;
+  minRole: UserRole;
+}
+
+const sidebarLinks: SidebarLink[] = [
+  { label: 'Dashboard', icon: LayoutDashboard, href: '#/admin', minRole: 'viewer' },
+  { label: 'Hero Slides', icon: Image, href: '#/admin/hero', minRole: 'viewer' },
+  { label: 'Services', icon: Heart, href: '#/admin/services', minRole: 'viewer' },
+  { label: 'Portfolio', icon: Camera, href: '#/admin/portfolio', minRole: 'viewer' },
+  { label: 'Testimonials', icon: MessageSquare, href: '#/admin/testimonials', minRole: 'viewer' },
+  { label: 'Pricing', icon: CreditCard, href: '#/admin/pricing', minRole: 'viewer' },
+  { label: 'Blog', icon: BookOpen, href: '#/admin/blog', minRole: 'viewer' },
+  { label: 'FAQ', icon: HelpCircle, href: '#/admin/faq', minRole: 'viewer' },
+  { label: 'Inquiries', icon: Mail, href: '#/admin/inquiries', minRole: 'viewer' },
+  { label: 'Contact Info', icon: Phone, href: '#/admin/contact', minRole: 'viewer' },
+  { label: 'Legal Pages', icon: FileText, href: '#/admin/legal', minRole: 'viewer' },
+  { label: 'Users', icon: Users, href: '#/admin/users', minRole: 'admin' },
+  { label: 'Settings', icon: Settings, href: '#/admin/settings', minRole: 'admin' },
 ];
 
-function SidebarContent({ onNavigate, onLogout }: { onNavigate: () => void; onLogout: () => void }) {
+const ROLE_HIERARCHY: Record<UserRole, number> = {
+  admin: 3,
+  editor: 2,
+  viewer: 1,
+};
+
+function RoleBadge({ role }: { role: UserRole | null }) {
+  if (!role) return null;
+  const config: Record<UserRole, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
+    admin: { label: 'Admin', color: 'bg-rose text-white', icon: Shield },
+    editor: { label: 'Editor', color: 'bg-blue-500 text-white', icon: ShieldCheck },
+    viewer: { label: 'Viewer', color: 'bg-slate-500 text-white', icon: Eye },
+  };
+  const c = config[role];
+  const Icon = c.icon;
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${c.color}`}>
+      <Icon className="w-3 h-3" />
+      {c.label}
+    </span>
+  );
+}
+
+function SidebarContent({ onNavigate, onLogout, role }: { onNavigate: () => void; onLogout: () => void; role: UserRole | null }) {
+  const visibleLinks = sidebarLinks.filter((link) => {
+    const userLevel = ROLE_HIERARCHY[role ?? 'viewer'] ?? 0;
+    const requiredLevel = ROLE_HIERARCHY[link.minRole] ?? 0;
+    return userLevel >= requiredLevel;
+  });
+
   return (
     <div className="flex flex-col h-full">
       {/* Brand */}
@@ -36,14 +74,14 @@ function SidebarContent({ onNavigate, onLogout }: { onNavigate: () => void; onLo
           </div>
           <div>
             <h2 className="text-white font-bold text-lg">Eventra</h2>
-            <p className="text-slate-400 text-xs">Admin Panel</p>
+            <div className="mt-0.5"><RoleBadge role={role} /></div>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-        {sidebarLinks.map((link) => (
+        {visibleLinks.map((link) => (
           <a
             key={link.href}
             href={link.href}
@@ -80,10 +118,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [authed, setAuthed] = useState(false);
   const [checked, setChecked] = useState(false);
+  const [role, setRole] = useState<UserRole | null>(null);
 
   useEffect(() => {
     const isAuth = isAdminAuthenticated();
     setAuthed(isAuth);
+    if (isAuth) {
+      setRole(getAdminRole());
+    }
     setChecked(true);
     if (!isAuth) {
       window.location.hash = '/admin/login';
@@ -111,13 +153,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="min-h-screen bg-gray-50">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col bg-slate-900">
-        <SidebarContent onNavigate={handleNavigate} onLogout={handleLogout} />
+        <SidebarContent onNavigate={handleNavigate} onLogout={handleLogout} role={role} />
       </aside>
 
       {/* Mobile Sidebar */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <SheetContent side="left" className="w-64 p-0 bg-slate-900 border-none">
-          <SidebarContent onNavigate={handleNavigate} onLogout={handleLogout} />
+          <SidebarContent onNavigate={handleNavigate} onLogout={handleLogout} role={role} />
         </SheetContent>
       </Sheet>
 
@@ -137,7 +179,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <h1 className="text-lg font-semibold text-foreground">Admin Panel</h1>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground hidden sm:block">Admin</span>
+              <RoleBadge role={role} />
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-1" />
                 Logout

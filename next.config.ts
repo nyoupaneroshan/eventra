@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  allowedDevOrigins: [
+    '.space-z.ai',
+    '.space-z.ai:81',
+  ],
 };
 
 export default nextConfig;

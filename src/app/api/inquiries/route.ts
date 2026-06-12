@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { verifyAuth } from '@/lib/auth';
+import { verifyAuth, requireRole } from '@/lib/auth';
 
+// GET /api/inquiries — List inquiries (any authenticated user)
 export async function GET(request: NextRequest) {
   const auth = await verifyAuth(request);
   if (!auth.authorized) return auth.error!;
@@ -9,6 +10,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(inquiries);
 }
 
+// POST /api/inquiries — Public inquiry submission (no auth required)
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

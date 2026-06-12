@@ -8,6 +8,7 @@ import { Search, Calendar, Tag, ArrowRight, BookOpen } from 'lucide-react';
 import { getBlogPosts } from '@/lib/api';
 import type { BlogPost } from '@/lib/types';
 import PageBanner from '@/components/page-banner';
+import Link from 'next/link';
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -57,7 +58,7 @@ export default function BlogPage() {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filtered.map((post) => (
-                <a key={post.id} href={`#/blog/${post.slug}`} className="group rounded-2xl overflow-hidden border border-border hover:shadow-xl transition-all duration-500 hover:-translate-y-1 bg-white">
+                <Link key={post.id} href={`/blog/${post.slug}`} className="group rounded-2xl overflow-hidden border border-border hover:shadow-xl transition-all duration-500 hover:-translate-y-1 bg-white">
                   {post.image && (<div className="relative h-48 overflow-hidden"><img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" /></div>)}
                   <div className="p-6">
                     <div className="flex items-center gap-3 mb-3">
@@ -68,7 +69,7 @@ export default function BlogPage() {
                     <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 mb-4">{post.excerpt}</p>
                     <span className="text-rose-dark font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">Read More <ArrowRight className="w-4 h-4" /></span>
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
           )}

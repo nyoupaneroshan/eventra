@@ -1,18 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-
-async function verifyAuth(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  const token = authHeader?.replace('Bearer ', '');
-  if (!token) return null;
-  const session = await db.adminSession.findUnique({ where: { token } });
-  if (!session || new Date() > session.expiresAt) return null;
-  return session;
-}
+import { verifyAuth, requireRole } from '@/lib/auth';
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await verifyAuth(request);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = requireRole(await verifyAuth(request), 'editor');
+  if (!auth.authorized) return auth.error!;
   try {
     const { id } = await params;
     const data = await request.json();
@@ -22,8 +14,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await verifyAuth(request);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = requireRole(await verifyAuth(request), 'editor');
+  if (!auth.authorized) return auth.error!;
   try {
     const { id } = await params;
     await db.legalPage.delete({ where: { id } });

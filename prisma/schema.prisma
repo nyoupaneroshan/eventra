@@ -105,8 +105,10 @@ model SiteSetting {
 model AdminSession {
   id        String   @id @default(cuid())
   token     String   @unique
+  userId    String
   createdAt DateTime @default(now())
   expiresAt DateTime
+  user      AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Inquiry {
@@ -131,6 +133,7 @@ model AdminUser {
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  sessions  AdminSession[]
 }
 
 model BlogPost {

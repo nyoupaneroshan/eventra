@@ -4,21 +4,24 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Phone, Shield } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const navLinks = [
-  { label: 'Home', href: '#/' },
-  { label: 'About', href: '#/about' },
-  { label: 'Services', href: '#/services' },
-  { label: 'Portfolio', href: '#/portfolio' },
-  { label: 'Blog', href: '#/blog' },
-  { label: 'Pricing', href: '#/pricing' },
-  { label: 'FAQ', href: '#/faq' },
-  { label: 'Contact', href: '#/contact' },
+  { label: 'Home', href: '/' },
+  { label: 'About', href: '/about' },
+  { label: 'Services', href: '/services' },
+  { label: 'Portfolio', href: '/portfolio' },
+  { label: 'Blog', href: '/blog' },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'FAQ', href: '/faq' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,8 +46,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <a
-            href="#/"
+          <Link
+            href="/"
             className="flex items-center gap-2 group"
           >
             <div className="w-10 h-10 rounded-full bg-rose flex items-center justify-center overflow-hidden">
@@ -61,35 +64,37 @@ export default function Navbar() {
             >
               Eventra
             </span>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 hover:bg-rose/10 ${
-                  scrolled
-                    ? 'text-foreground hover:text-rose-dark'
-                    : 'text-white/90 hover:text-white hover:bg-white/10'
+                  pathname === link.href
+                    ? scrolled ? 'text-rose-dark bg-rose/10' : 'text-white bg-white/10'
+                    : scrolled
+                      ? 'text-foreground hover:text-rose-dark'
+                      : 'text-white/90 hover:text-white hover:bg-white/10'
                 }`}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
             <Button
               size="sm"
               className="ml-3 bg-rose hover:bg-rose-dark text-white"
               asChild
             >
-              <a href="#/contact">
+              <Link href="/contact">
                 <Phone className="w-4 h-4 mr-1" />
                 Get Quote
-              </a>
+              </Link>
             </Button>
-            <a
-              href="#/admin"
+            <Link
+              href="/admin"
               className={`ml-2 px-2 py-1 rounded text-xs font-medium transition-colors duration-200 ${
                 scrolled
                   ? 'text-muted-foreground hover:text-rose-dark'
@@ -98,7 +103,7 @@ export default function Navbar() {
               title="Admin Panel"
             >
               <Shield className="w-4 h-4" />
-            </a>
+            </Link>
           </div>
 
           {/* Mobile Menu */}
@@ -120,24 +125,28 @@ export default function Navbar() {
               </div>
               <div className="flex flex-col p-4 gap-1">
                 {navLinks.map((link) => (
-                  <a
+                  <Link
                     key={link.href}
                     href={link.href}
                     onClick={handleNavClick}
-                    className="px-4 py-3 rounded-md text-base font-medium text-foreground hover:bg-rose/10 hover:text-rose-dark transition-colors"
+                    className={`px-4 py-3 rounded-md text-base font-medium transition-colors ${
+                      pathname === link.href
+                        ? 'bg-rose/10 text-rose-dark'
+                        : 'text-foreground hover:bg-rose/10 hover:text-rose-dark'
+                    }`}
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 ))}
                 <div className="mt-4 pt-4 border-t">
                   <Button
                     className="w-full bg-rose hover:bg-rose-dark text-white"
                     asChild
                   >
-                    <a href="#/contact" onClick={handleNavClick}>
+                    <Link href="/contact" onClick={handleNavClick}>
                       <Phone className="w-4 h-4 mr-2" />
                       Get Free Quote
-                    </a>
+                    </Link>
                   </Button>
                 </div>
               </div>

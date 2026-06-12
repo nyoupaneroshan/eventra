@@ -7,6 +7,7 @@ import { CheckCircle2, ArrowRight, Crown, Sparkles, Star } from 'lucide-react';
 import PageBanner from '@/components/page-banner';
 import { getPricingPackages } from '@/lib/api';
 import type { PricingPackage } from '@/lib/types';
+import Link from 'next/link';
 
 const pkgIconMap: Record<string, React.ElementType> = {
   Star,
@@ -104,10 +105,10 @@ export default function PricingPage() {
                         }`}
                         asChild
                       >
-                        <a href="#/contact">
+                        <Link href="/contact">
                           Get This Package
                           <ArrowRight className="ml-2 w-4 h-4" />
-                        </a>
+                        </Link>
                       </Button>
                     </div>
                   </div>
@@ -119,10 +120,10 @@ export default function PricingPage() {
             <p className="text-muted-foreground text-base">
               Every event is unique! These packages are starting points.
               <br />
-              <a href="#/contact" className="text-rose-dark font-semibold hover:underline inline-flex items-center gap-1">
+              <Link href="/contact" className="text-rose-dark font-semibold hover:underline inline-flex items-center gap-1">
                 Contact us for a personalized quote
                 <ArrowRight className="w-4 h-4" />
-              </a>
+              </Link>
             </p>
           </div>
         </div>

@@ -8,11 +8,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { UserPlus, Pencil, Trash2, Shield, Users } from 'lucide-react';
-import { getAdminUsers, createAdminUser, updateAdminUser, deleteAdminUser } from '@/lib/api';
+import { UserPlus, Pencil, Trash2, Shield, Users, Eye, ShieldCheck } from 'lucide-react';
+import { getAdminUsers, createAdminUser, updateAdminUser, deleteAdminUser, isAdmin, isEditor, getAdminUserId } from '@/lib/api';
 import type { AdminUser } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import AdminDeleteDialog from '@/components/admin/admin-delete-dialog';
+
+function RoleIcon({ role }: { role: string }) {
+  if (role === 'admin') return <Shield className="w-3 h-3" />;
+  if (role === 'editor') return <ShieldCheck className="w-3 h-3" />;
+  return <Eye className="w-3 h-3" />;
+}
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -24,6 +30,9 @@ export default function AdminUsers() {
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'admin' });
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+
+  const canEdit = isAdmin();
+  const currentUserId = getAdminUserId();
 
   const load = () => { getAdminUsers().then(setUsers).catch(() => setUsers([])).finally(() => setLoading(false)); };
   useEffect(() => { load(); }, []);
@@ -53,14 +62,16 @@ export default function AdminUsers() {
   const handleDelete = async () => {
     if (!deleting) return;
     try { await deleteAdminUser(deleting.id); toast({ title: 'User deleted' }); setDeleteOpen(false); load(); }
-    catch { toast({ title: 'Error', variant: 'destructive' }); }
+    catch (e) { toast({ title: 'Error', description: e instanceof Error ? e.message : 'Failed', variant: 'destructive' }); }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-foreground">Admin Users</h2>
-        <Button onClick={openCreate} className="bg-rose hover:bg-rose-dark text-white"><UserPlus className="w-4 h-4 mr-2" />Add User</Button>
+        {canEdit && (
+          <Button onClick={openCreate} className="bg-rose hover:bg-rose-dark text-white"><UserPlus className="w-4 h-4 mr-2" />Add User</Button>
+        )}
       </div>
       <Card>
         <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Users className="w-5 h-5" />Registered Users</CardTitle></CardHeader>
@@ -68,15 +79,22 @@ export default function AdminUsers() {
           {loading ? (<div className="space-y-3">{[1,2,3].map((i) => (<Skeleton key={i} className="h-12 w-full" />))}</div>) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead><tr className="border-b"><th className="text-left py-3 px-2 font-medium text-muted-foreground">Name</th><th className="text-left py-3 px-2 font-medium text-muted-foreground">Email</th><th className="text-left py-3 px-2 font-medium text-muted-foreground">Role</th><th className="text-left py-3 px-2 font-medium text-muted-foreground">Status</th><th className="text-right py-3 px-2 font-medium text-muted-foreground">Actions</th></tr></thead>
+              <thead><tr className="border-b"><th className="text-left py-3 px-2 font-medium text-muted-foreground">Name</th><th className="text-left py-3 px-2 font-medium text-muted-foreground">Email</th><th className="text-left py-3 px-2 font-medium text-muted-foreground">Role</th><th className="text-left py-3 px-2 font-medium text-muted-foreground">Status</th>{canEdit && <th className="text-right py-3 px-2 font-medium text-muted-foreground">Actions</th>}</tr></thead>
               <tbody>
                 {users.map((u) => (
                   <tr key={u.id} className="border-b hover:bg-muted/50">
-                    <td className="py-3 px-2 font-medium">{u.name}</td>
+                    <td className="py-3 px-2 font-medium">{u.name}{u.id === currentUserId && <span className="ml-2 text-xs text-muted-foreground">(you)</span>}</td>
                     <td className="py-3 px-2 text-muted-foreground">{u.email}</td>
-                    <td className="py-3 px-2"><span className="inline-flex items-center gap-1 px-2 py-0.5 bg-rose/10 text-rose-dark rounded-full text-xs"><Shield className="w-3 h-3" />{u.role}</span></td>
+                    <td className="py-3 px-2"><span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${u.role === 'admin' ? 'bg-rose/10 text-rose-dark' : u.role === 'editor' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}><RoleIcon role={u.role} />{u.role}</span></td>
                     <td className="py-3 px-2"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${u.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>{u.active ? 'Active' : 'Inactive'}</span></td>
-                    <td className="py-3 px-2 text-right"><Button variant="ghost" size="icon" onClick={() => openEdit(u)}><Pencil className="w-4 h-4" /></Button><Button variant="ghost" size="icon" onClick={() => openDelete(u)} className="text-destructive"><Trash2 className="w-4 h-4" /></Button></td>
+                    {canEdit && (
+                      <td className="py-3 px-2 text-right">
+                        <Button variant="ghost" size="icon" onClick={() => openEdit(u)}><Pencil className="w-4 h-4" /></Button>
+                        {u.id !== currentUserId && (
+                          <Button variant="ghost" size="icon" onClick={() => openDelete(u)} className="text-destructive"><Trash2 className="w-4 h-4" /></Button>
+                        )}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
